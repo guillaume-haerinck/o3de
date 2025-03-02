@@ -227,6 +227,40 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
             Gem::ExpressionEvaluation
     )
 
+    ly_add_target(
+        NAME ${gem_name}Application APPLICATION
+        NAMESPACE Gem
+        FILES_CMAKE
+            scriptcanvasgem_application_files.cmake
+        COMPILE_DEFINITIONS
+            PUBLIC
+                SCRIPTCANVAS_ERRORS_ENABLED
+            PRIVATE
+                SCRIPTCANVAS_EDITOR
+                ${SCRIPT_CANVAS_COMMON_DEFINES}
+        INCLUDE_DIRECTORIES
+            PRIVATE
+                Editor
+        BUILD_DEPENDENCIES
+            PRIVATE
+                AZ::AzCore
+                AZ::AzToolsFramework
+                AZ::AzQtComponents
+                Legacy::EditorCore
+                Gem::${gem_name}.Editor
+                Gem::${gem_name}.Editor.Static
+        RUNTIME_DEPENDENCIES
+            Gem::${gem_name}.Editor
+    )
+
+    # Inject target name for dependency resolution
+    ly_add_source_properties(
+        SOURCES
+            Application/main.cpp
+        PROPERTY COMPILE_DEFINITIONS
+            VALUES
+                LY_CMAKE_TARGET="${gem_name}Application")
+
     # Inject the gem name into the Module source file
     ly_add_source_properties(
         SOURCES
@@ -240,6 +274,17 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
     ly_create_alias(NAME ${gem_name}.Builders NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
     ly_create_alias(NAME ${gem_name}.Tools    NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
 
+    ly_set_gem_variant_to_load(TARGETS ${gem_name}Application VARIANTS Tools)
+    
+    # Add build dependency to Editor for the ScriptCanvas application since
+    # Editor opens up the ScriptCanvas
+    ly_add_dependencies(Editor Gem::${gem_name}Application)
+
+    # Inject the project path into the ScriptCanvas VS debugger command arguments if the build system being invoked
+    # in a project centric view
+    if(NOT PROJECT_NAME STREQUAL "O3DE")
+        set_property(TARGET ${gem_name}Application APPEND PROPERTY VS_DEBUGGER_COMMAND_ARGUMENTS "--project-path=\"${CMAKE_SOURCE_DIR}\"")
+    endif()
 
 endif()
 
