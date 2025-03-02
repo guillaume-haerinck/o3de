@@ -7,8 +7,5 @@
 #
 
 set(FILES
-    Application/main.cpp
-    Application/ScriptCanvasApplication.cpp
-    Application/ScriptCanvasApplication.h
-    Application/ScriptCanvasApplicationResources.qrc
+    ScriptCanvasApplication.rc
 )

@@ -21,6 +21,13 @@
 #include <AzToolsFramework/AssetBrowser/AssetBrowserBus.h>
 #include <AzToolsFramework/AssetBrowser/AssetBrowserComponent.h>
 #include <AzToolsFramework/Thumbnails/ThumbnailerComponent.h>
+#include <QIcon>
+
+// This has to live outside of any namespaces due to issues on Linux with calls to Q_INIT_RESOURCE if they are inside a namespace
+void InitScriptCanvasApplicationResources()
+{
+    Q_INIT_RESOURCE(ScriptCanvasApplicationResources);
+}
 
 namespace ScriptCanvas
 {
@@ -31,6 +38,8 @@ namespace ScriptCanvas
     ScriptCanvasQtApplication::ScriptCanvasQtApplication(int& argc, char** argv)
         : Base(argc, argv)
     {
+        InitScriptCanvasApplicationResources();
+        QApplication::setWindowIcon(QIcon(":/Resources/application.svg"));
         installEventFilter(new AzQtComponents::GlobalEventFilter(this));
     }
 

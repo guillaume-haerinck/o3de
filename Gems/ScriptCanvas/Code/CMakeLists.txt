@@ -153,6 +153,7 @@ ly_create_alias(NAME ${gem_name}.Servers  NAMESPACE Gem TARGETS Gem::${gem_name}
 ly_create_alias(NAME ${gem_name}.Unified  NAMESPACE Gem TARGETS Gem::${gem_name})
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
+
     ly_add_target(
         NAME ${gem_name}.Editor.Static STATIC
         NAMESPACE Gem
@@ -227,11 +228,15 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
             Gem::ExpressionEvaluation
     )
 
+    o3de_pal_dir(pal_source_dir ${CMAKE_CURRENT_LIST_DIR}/Application/Platform/${PAL_PLATFORM_NAME} "${gem_restricted_path}" "${gem_path}" "${gem_parent_relative_path}")
+
     ly_add_target(
         NAME ${gem_name}Application APPLICATION
         NAMESPACE Gem
+        AUTORCC
         FILES_CMAKE
             scriptcanvasgem_application_files.cmake
+            ${pal_source_dir}/platform_${PAL_PLATFORM_NAME_LOWERCASE}_files.cmake
         COMPILE_DEFINITIONS
             PUBLIC
                 SCRIPTCANVAS_ERRORS_ENABLED
@@ -240,6 +245,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 ${SCRIPT_CANVAS_COMMON_DEFINES}
         INCLUDE_DIRECTORIES
             PRIVATE
+                Application
                 Editor
         BUILD_DEPENDENCIES
             PRIVATE
